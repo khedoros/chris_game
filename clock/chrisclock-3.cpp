@@ -10,9 +10,11 @@
 const float PI = M_PI;
 const int WINDOW_WIDTH = 1200;
 const int WINDOW_HEIGHT = 900;
-const float CLOCK_RADIUS = 200.0f;
+const float CLOCK_RADIUS = WINDOW_HEIGHT / 2.5f;
 const float HOUR_HAND_LENGTH = 0.6f * CLOCK_RADIUS;
+const float HOUR_HAND_WIDTH = CLOCK_RADIUS / 50.0;
 const float MINUTE_HAND_LENGTH = 0.8f * CLOCK_RADIUS;
+const float MINUTE_HAND_WIDTH = CLOCK_RADIUS / 75.0;
 const sf::Color BACKGROUND_COLOR(30, 30, 30);
 const sf::Color CLOCK_COLOR(255, 255, 255);
 const sf::Color HAND_COLOR(0, 0, 0);
@@ -191,12 +193,12 @@ int main() {
         drawClockTicks(window, clockShape, NUM_HOUR_TICKS, HOUR_TICK_LENGTH, HOUR_TICK_COLOR);
         drawClockNumbers(window, clockShape, font, FONT_SIZE);
 
-        sf::RectangleShape hourHandShape(sf::Vector2f(5.0f, -HOUR_HAND_LENGTH));
+        sf::RectangleShape hourHandShape(sf::Vector2f(HOUR_HAND_WIDTH, -HOUR_HAND_LENGTH));
         hourHandShape.setFillColor(HAND_COLOR);
         // hourHandShape.setOrigin(2.5f,HOUR_HAND_LENGTH);
         hourHandShape.setOrigin(2.5f, 0);
 
-        sf::RectangleShape minuteHandShape(sf::Vector2f(3.0f, -MINUTE_HAND_LENGTH));
+        sf::RectangleShape minuteHandShape(sf::Vector2f(MINUTE_HAND_WIDTH, -MINUTE_HAND_LENGTH));
         minuteHandShape.setFillColor(HAND_COLOR);
         // minuteHandShape.setOrigin(1.5f, MINUTE_HAND_LENGTH);
         minuteHandShape.setOrigin(1.5f, 0);
