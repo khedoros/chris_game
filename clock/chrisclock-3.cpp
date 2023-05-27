@@ -7,18 +7,9 @@
 #include <array>
 #include <string>
 
-const float PI = M_PI;
 const int WINDOW_WIDTH = 1200;
 const int WINDOW_HEIGHT = 900;
 const float CLOCK_RADIUS = WINDOW_HEIGHT / 2.5f;
-const float HOUR_HAND_LENGTH = 0.6f * CLOCK_RADIUS;
-const float HOUR_HAND_WIDTH = CLOCK_RADIUS / 50.0;
-const float MINUTE_HAND_LENGTH = 0.8f * CLOCK_RADIUS;
-const float MINUTE_HAND_WIDTH = CLOCK_RADIUS / 75.0;
-const sf::Color BACKGROUND_COLOR(30, 30, 30);
-const sf::Color CLOCK_COLOR(255, 255, 255);
-const sf::Color HAND_COLOR(0, 0, 0);
-const int FONT_SIZE = 48;
 
 void updateDigitalClock(sf::Text& digitalClockText, int hours, int minutes) {
     std::ostringstream oss;
@@ -67,7 +58,7 @@ void updateAnalogClock(sf::Text& analogClockText, int hours, int minutes) {
 }
 
 void drawClockTicks(sf::RenderWindow& window, sf::CircleShape& clockShape, int numTicks, float tickLength, sf::Color tickColor) {
-    float angleStep = 2 * PI / static_cast<float>(numTicks);
+    float angleStep = 2 * M_PI / static_cast<float>(numTicks);
 
     sf::Vector2f clockCenter = clockShape.getPosition() + sf::Vector2f(CLOCK_RADIUS, CLOCK_RADIUS);
 
@@ -78,21 +69,21 @@ void drawClockTicks(sf::RenderWindow& window, sf::CircleShape& clockShape, int n
         tickShape.setOrigin(tickShape.getSize().x / 2, CLOCK_RADIUS);
         tickShape.setPosition(clockCenter);
         tickShape.setFillColor(tickColor);
-        tickShape.setRotation(currentAngle * 180.0 / PI);
+        tickShape.setRotation(currentAngle * 180.0 / M_PI);
         window.draw(tickShape);
     }
 }
 
-void drawClockNumbers(sf::RenderWindow& window, sf::CircleShape& clockShape, sf::Font& font, int fontSize) {
+void drawClockNumbers(sf::RenderWindow& window, sf::CircleShape& clockShape, sf::Font& font, int fontSize, sf::Color numberColor) {
     const int NUM_HOURS = 12;
-    float angleStep = 2 * PI / static_cast<float>(NUM_HOURS);
+    float angleStep = 2 * M_PI / static_cast<float>(NUM_HOURS);
 
     sf::Vector2f clockCenter = clockShape.getPosition() + sf::Vector2f(CLOCK_RADIUS, CLOCK_RADIUS);
 
     for (int i = 1; i <= NUM_HOURS; ++i) {
-        float currentAngle = angleStep * static_cast<float>(i) - PI / 2;
+        float currentAngle = angleStep * static_cast<float>(i) - M_PI / 2;
         sf::Text numberText(std::to_string(i), font, fontSize);
-        numberText.setFillColor(HAND_COLOR);
+        numberText.setFillColor(numberColor);
         sf::FloatRect bounds = numberText.getLocalBounds();
         numberText.setOrigin(bounds.width / 2.0, bounds.height);
         float distance = 0.8 * CLOCK_RADIUS;
@@ -115,13 +106,15 @@ int main() {
         return 1;
     }
 
+    const int FONT_SIZE = 48;
+    const sf::Color TEXT_COLOR(255, 255, 255);
     sf::Text digitalClockText("", font, FONT_SIZE);
-    digitalClockText.setFillColor(CLOCK_COLOR);
+    digitalClockText.setFillColor(TEXT_COLOR);
     digitalClockText.setPosition(10.0f, 10.0f);
     updateDigitalClock(digitalClockText, hours, minutes);
 
     sf::Text analogClockText("", font, FONT_SIZE);
-    analogClockText.setFillColor(CLOCK_COLOR);
+    analogClockText.setFillColor(TEXT_COLOR);
     analogClockText.setPosition(200.0f, 10.0f); // TODO: Center text near bottom of screen
     updateAnalogClock(analogClockText, hours, minutes);
 
@@ -172,8 +165,10 @@ int main() {
             }
         }
 
+        const sf::Color BACKGROUND_COLOR(30, 30, 30);
         window.clear(BACKGROUND_COLOR);
 
+        const sf::Color CLOCK_COLOR(255, 255, 255);
         sf::CircleShape clockShape(CLOCK_RADIUS);
         clockShape.setFillColor(CLOCK_COLOR);
         clockShape.setPosition(WINDOW_WIDTH / 2 - CLOCK_RADIUS, WINDOW_HEIGHT / 2 - CLOCK_RADIUS);
@@ -181,36 +176,38 @@ int main() {
         window.draw(clockShape);
 
         const int NUM_HOUR_TICKS = 12;
-        // const float HOUR_TICK_LENGTH = 10.0f;
         const float HOUR_TICK_LENGTH = CLOCK_RADIUS / 10;
         const int NUM_MINUTE_TICKS = 60;
-        // const float MINUTE_TICK_LENGTH = 5.0f;
         const float MINUTE_TICK_LENGTH = CLOCK_RADIUS / 15;
 
         const sf::Color HOUR_TICK_COLOR(255, 0, 0);
         const sf::Color MINUTE_TICK_COLOR(255, 120, 120);
+        const sf::Color NUMBER_COLOR(0,0,0);
         drawClockTicks(window, clockShape, NUM_MINUTE_TICKS, MINUTE_TICK_LENGTH, MINUTE_TICK_COLOR);
         drawClockTicks(window, clockShape, NUM_HOUR_TICKS, HOUR_TICK_LENGTH, HOUR_TICK_COLOR);
-        drawClockNumbers(window, clockShape, font, FONT_SIZE);
+        drawClockNumbers(window, clockShape, font, FONT_SIZE, NUMBER_COLOR);
 
+        const float HOUR_HAND_LENGTH = 0.6f * CLOCK_RADIUS;
+        const float HOUR_HAND_WIDTH = CLOCK_RADIUS / 50.0;
+        const sf::Color HAND_COLOR(0, 0, 0);
         sf::RectangleShape hourHandShape(sf::Vector2f(HOUR_HAND_WIDTH, -HOUR_HAND_LENGTH));
         hourHandShape.setFillColor(HAND_COLOR);
-        // hourHandShape.setOrigin(2.5f,HOUR_HAND_LENGTH);
         hourHandShape.setOrigin(2.5f, 0);
 
+        const float MINUTE_HAND_LENGTH = 0.8f * CLOCK_RADIUS;
+        const float MINUTE_HAND_WIDTH = CLOCK_RADIUS / 75.0;
         sf::RectangleShape minuteHandShape(sf::Vector2f(MINUTE_HAND_WIDTH, -MINUTE_HAND_LENGTH));
         minuteHandShape.setFillColor(HAND_COLOR);
-        // minuteHandShape.setOrigin(1.5f, MINUTE_HAND_LENGTH);
         minuteHandShape.setOrigin(1.5f, 0);
 
 
-        float hourAngle = (hours % 12 + minutes / 60.0f) * (2 * PI / 12) /*- PI / 2*/;
-        hourHandShape.setRotation(hourAngle * 180 / PI);
+        float hourAngle = (hours % 12 + minutes / 60.0f) * (2 * M_PI / 12);
+        hourHandShape.setRotation(hourAngle * 180 / M_PI);
         hourHandShape.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
         window.draw(hourHandShape);
 
-        float minuteAngle = (minutes / 60.0f) * (2 * PI)/* - PI / 2*/;
-        minuteHandShape.setRotation(minuteAngle * 180 / PI);
+        float minuteAngle = (minutes / 60.0f) * (2 * M_PI);
+        minuteHandShape.setRotation(minuteAngle * 180 / M_PI);
         minuteHandShape.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
         window.draw(minuteHandShape);
 
